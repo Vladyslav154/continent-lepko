@@ -12,20 +12,20 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from coinbase_commerce.client import Client
 
-# --- 1. Настройки и константы ---
+# --- 1. Settings and Constants ---
 app = FastAPI(title="Continent Lepko")
 
-# Переменные окружения
+# Environment Variables
 SECRET_KEY = os.getenv('SECRET_KEY', 'default-secret-for-local-dev')
 COINBASE_API_KEY = os.getenv('COINBASE_API_KEY', 'DEFAULT_KEY')
 REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
 
-# Настройки Drop
+# Drop Settings
 UPLOAD_FOLDER = 'temp_uploads'
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'zip', 'rar'}
 
-# --- 2. Инициализация ---
+# --- 2. Initialization ---
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
@@ -40,7 +40,7 @@ except redis.exceptions.ConnectionError as e:
     redis_client = None
 
 
-# --- 3. Логика перевода ---
+# --- 3. Translation Logic ---
 TRANSLATIONS = {}
 LANGUAGES = {'en': 'EN', 'ru': 'RU', 'de': 'DE', 'cs': 'CS', 'uk': 'UK'}
 
@@ -54,7 +54,7 @@ def load_translations():
 
 load_translations()
 
-# --- 4. Главная функция для рендеринга шаблонов ---
+# --- 4. Main Template Rendering Function ---
 def render(template_name: str, request: Request, context: dict = {}):
     lang_code = request.query_params.get('lang', request.session.get('lang', 'en'))
     if lang_code not in LANGUAGES:
@@ -65,7 +65,7 @@ def render(template_name: str, request: Request, context: dict = {}):
         text = TRANSLATIONS.get(lang_code, {}).get(key, key)
         return text.format(**kwargs) if kwargs else text
 
-    # Добавляем данные счетчиков в контекст каждой страницы
+    # Add counter data to every page context
     if redis_client:
         files_count = redis_client.get('counter:files') or 0
         links_count = redis_client.get('counter:links') or 0
@@ -76,13 +76,13 @@ def render(template_name: str, request: Request, context: dict = {}):
     full_context = {"request": request, "t": t, "LANGUAGES": LANGUAGES, "current_lang": lang_code, **context}
     return templates.TemplateResponse(template_name, full_context)
 
-# --- 5. Маршруты ---
+# --- 5. Routes ---
 
 @app.get("/", response_class=HTMLResponse)
 async def route_root(request: Request):
     return render("home.html", request)
 
-# --- Drop с валидацией ---
+# --- Drop with Validation ---
 @app.get("/drop", response_class=HTMLResponse)
 async def route_get_drop(request: Request):
     return render("drop.html", request, {"error": None})
@@ -90,6 +90,7 @@ async def route_get_drop(request: Request):
 @app.post("/drop", response_class=HTMLResponse)
 async def route_post_drop(request: Request, file: UploadFile = File(...)):
     t = render("", request).context['t']
+    
     file_ext = file.filename.split('.')[-1].lower() if '.' in file.filename else ''
     if file_ext not in ALLOWED_EXTENSIONS:
         error = t('drop_error_file_type', allowed_types=", ".join(ALLOWED_EXTENSIONS))
@@ -114,9 +115,12 @@ async def route_post_drop(request: Request, file: UploadFile = File(...)):
 
 @app.get("/uploads/{filename}")
 async def route_get_upload(filename: str):
-    return FileResponse(path=os.path.join(UPLOAD_FOLDER, filename), filename=filename)
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(path=file_path, filename=filename)
 
-# --- Pad с паролями и Redis ---
+# --- Pad with Passwords & Redis ---
 @app.get("/pad", response_class=HTMLResponse)
 async def route_get_pad(request: Request):
     return render("pad.html", request)
@@ -144,12 +148,10 @@ async def route_enter_pad_room(request: Request, room_id: str, password: str = F
     
     stored_hash = redis_client.get(f"pad:password:{room_id}")
     if stored_hash and check_password_hash(stored_hash, password):
-        # Пароль верный, показываем редактор
         return render("pad_editor.html", request, {"room_id": room_id})
-    # Пароль неверный, показываем ошибку
     return render("pad_room.html", request, {"room_id": room_id, "error": True})
 
-# --- Upgrade и Coinbase ---
+# --- Upgrade and Coinbase ---
 @app.get("/upgrade", response_class=HTMLResponse)
 async def route_get_upgrade(request: Request):
     return render("upgrade.html", request)
@@ -157,17 +159,22 @@ async def route_get_upgrade(request: Request):
 @app.post("/create_charge")
 async def route_create_charge(request: Request):
     t = render("", request).context['t']
-    charge = coinbase_client.charge.create(
-        name=t('premium_charge_name'),
-        description=t('premium_charge_description'),
-        local_price={'amount': '10.00', 'currency': 'USD'},
-        pricing_type='fixed_price',
-        redirect_url=str(request.base_url) + 'payment_success',
-        cancel_url=str(request.base_url) + 'upgrade'
-    )
-    if redis_client:
-        redis_client.incr('counter:links')
-    return RedirectResponse(charge.hosted_url, status_code=303)
+    try:
+        charge = coinbase_client.charge.create(
+            name=t('premium_charge_name'),
+            description=t('premium_charge_description'),
+            local_price={'amount': '10.00', 'currency': 'USD'},
+            pricing_type='fixed_price',
+            redirect_url=str(request.base_url) + 'payment_success',
+            cancel_url=str(request.base_url) + 'upgrade'
+        )
+        if redis_client:
+            redis_client.incr('counter:links')
+        return RedirectResponse(charge.hosted_url, status_code=303)
+    except Exception as e:
+        print(f"Coinbase API Error: {e}")
+        raise HTTPException(status_code=500, detail="Could not create payment link.")
+
 
 @app.get("/payment_success")
 async def route_payment_success(request: Request):
