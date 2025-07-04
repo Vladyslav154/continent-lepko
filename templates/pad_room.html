@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ t('pad_enter_prompt', room_id=room_id) }}</h1>
+<form action="/pad/{{ room_id }}/enter" method="post">
+    <input type="password" name="password" placeholder="{{ t('pad_password_placeholder') }}" required>
+    <button type="submit">{{ t('pad_enter_button') }}</button>
+</form>
+{% if error %}
+<p style="color: red; margin-top: 20px;">{{ t('pad_wrong_password') }}</p>
+{% endif %}
+{% endblock %}

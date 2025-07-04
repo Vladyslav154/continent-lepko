@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="home-container">
+    <div class="brand-block">
+        <h1>{{ t('app_title') }}</h1>
+        <p>{{ t('app_subtitle') }}</p>
+    </div>
+    <div class="tools-block">
+        <a href="/drop" class="tool-link">
+            <h2>{{ t('drop_title') }}</h2>
+            <p>{{ t('drop_description') }}</p>
+        </a>
+        <a href="/pad" class="tool-link">
+            <h2>{{ t('pad_title') }}</h2>
+            <p>{{ t('pad_description') }}</p>
+        </a>
+    </div>
+    <div class="stats-block">
+        <div class="stat-item">
+            <span class="stat-number" id="files-counter">0</span>
+            <span class="stat-label">{{ t('files_transferred_label') }}</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" id="links-counter">0</span>
+            <span class="stat-label">{{ t('links_generated_label') }}</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
