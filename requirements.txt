@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+python-multipart
+aiofiles
+jinja2
+redis
+starlette
+slowapi
+coinbase-commerce
+itsdangerous
+werkzeug
+bleach
