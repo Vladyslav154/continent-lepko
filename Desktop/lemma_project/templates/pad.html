@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Pad - Lemma Tools</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <style>
+        /* Стили остаются такими же, как в styles.css, но добавим стили для оверлея */
+        @import url('/static/styles.css');
+        #encryption-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(18, 18, 18, 0.95);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: #e0e0e0;
+        }
+        #encryption-overlay input {
+            background-color: #1d1d1d;
+            border: 1px solid #4a4a4a;
+            color: #e0e0e0;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        #encryption-overlay button {
+            background-color: #00f5d4;
+            color: #121212;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="encryption-overlay">
+        <h2>Защищенная доска</h2>
+        <p>Введите ключ шифрования для этой сессии:</p>
+        <input type="password" id="encryption-key" placeholder="Ваш секретный ключ">
+        <button id="set-key-button">Войти</button>
+    </div>
+
+    <a href="/" class="home-link">&larr;</a>
+    <textarea id="notepad" placeholder="Ожидание ключа шифрования..." disabled></textarea>
+    <div class="status-bar">
+        <span>ID доски: {{ board_id }} | 🔒 End-to-End Шифрование активно</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const notepad = document.getElementById('notepad');
+            const boardId = "{{ board_id }}";
+            const overlay = document.getElementById('encryption-overlay');
+            const keyInput = document.getElementById('encryption-key');
+            const setKeyButton = document.getElementById('set-key-button');
+
+            let sessionKey = null;
+            let socket;
+
+            // --- Логика Шифрования ---
+            function encrypt(text, key) {
+                return CryptoJS.AES.encrypt(text, key).toString();
+            }
+
+            function decrypt(ciphertext, key) {
+                const bytes = CryptoJS.AES.decrypt(ciphertext, key);
+                return bytes.toString(CryptoJS.enc.Utf8);
+            }
+
+            // --- Логика установки ключа ---
+            function setupSession() {
+                sessionKey = keyInput.value;
+                if (!sessionKey) {
+                    alert('Ключ шифрования не может быть пустым.');
+                    return;
+                }
+                overlay.style.display = 'none';
+                notepad.disabled = false;
+                notepad.placeholder = 'Соединение установлено. Начните печатать...';
+                connect();
+            }
+
+            setKeyButton.addEventListener('click', setupSession);
+            keyInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    setupSession();
+                }
+            });
+
+            // --- Логика WebSocket ---
+            function connect() {
+                const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${wsProtocol}//${window.location.host}/ws/${boardId}`;
+                socket = new WebSocket(wsUrl);
+
+                socket.onmessage = function(event) {
+                    try {
+                        const decryptedText = decrypt(event.data, sessionKey);
+                        if (notepad.value !== decryptedText) {
+                            notepad.value = decryptedText;
+                        }
+                    } catch (e) {
+                        // Ошибка дешифровки, скорее всего неверный ключ
+                        console.error("Decryption failed. Wrong key?");
+                        notepad.value = "Ошибка дешифровки: неверный ключ.";
+                    }
+                };
+                
+                // ... остальная логика WebSocket (onopen, onclose, onerror) ...
+            }
+
+            let timeoutId;
+            notepad.addEventListener('input', () => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    if (socket && socket.readyState === WebSocket.OPEN && sessionKey) {
+                        const encryptedText = encrypt(notepad.value, sessionKey);
+                        socket.send(encryptedText);
+                    }
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>

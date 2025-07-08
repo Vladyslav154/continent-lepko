@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drop - Ваш Проект</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        /* Стили только для элементов этой страницы */
+        #upload-area {
+            border: 2px dashed #0f3460;
+            padding: 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        #upload-area:hover {
+            background-color: #16213e;
+            border-color: #e94560;
+        }
+        #file-input {
+            display: none;
+        }
+        button {
+            background-color: #e94560;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #c43751;
+        }
+        #link-area {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #16213e;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            display: none;
+            word-wrap: break-word;
+        }
+        #link-area a {
+            color: #e94560;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        #file-name {
+            margin-top: 15px;
+            font-style: italic;
+            color: #a9a9a9;
+        }
+        .home-link {
+            margin-top: 30px;
+            display: block;
+            color: #a9a9a9;
+            text-decoration: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Одноразовый Файл 📁</h1>
+        <div id="upload-area">
+            <p>Перетащите файл сюда или нажмите, чтобы выбрать</p>
+            <p id="file-name"></p>
+            <input type="file" id="file-input">
+        </div>
+        <button id="upload-button" style="display: none;">Получить ссылку</button>
+
+        <div id="link-area">
+            <p>Ваша одноразовая ссылка:</p>
+            <a href="" id="file-link" target="_blank"></a>
+        </div>
+
+        <a href="/" class="home-link">Вернуться на главную</a>
+    </div>
+
+    <script src="/static/drop_script.js"></script>
+</body>
+</html>

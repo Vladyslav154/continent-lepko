@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR - Lemma Tools</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.6.0/dist/easy.qrcode.min.js"></script>
+</head>
+<body>
+    <a href="/" class="home-link">&larr; На главную</a>
+    <div class="container">
+        <h1>QR Генератор</h1>
+        <p class="subtitle">Приватный QR-генератор. Все происходит в вашем браузере.</p>
+        
+        <div class="qr-container">
+            <textarea id="qr-input" placeholder="Введите текст или ссылку..."></textarea>
+            <div id="qrcode-container"></div>
+        </div>
+        <p style="font-size:0.9rem; opacity: 0.7; margin-top: 2rem;">🔒 Ваши данные никогда не покидают ваш компьютер.</p>
+    </div>
+    
+    <script src="/static/qr_script.js"></script>
+</body>
+</html>
