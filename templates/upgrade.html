@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ t('premium_title') }}</h1>
+<p>{{ t('premium_description') }}</p>
+<form action="/create_charge" method="post">
+    <button type="submit">{{ t('premium_button_text') }}</button>
+</form>
+{% endblock %}

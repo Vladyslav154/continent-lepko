@@ -1,0 +1,213 @@
+/* --- Импорт шрифта и настройка анимации --- */
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&display=swap');
+
+@keyframes moveGrid {
+    from { background-position: 0 0; }
+    to { background-position: 100px 100px; }
+}
+
+/* --- Основные стили --- */
+body {
+    font-family: 'Chakra Petch', sans-serif;
+    margin: 0;
+    color: #e0e0e0;
+    overflow: hidden;
+    background-color: #0a0a0a;
+    background-image:
+        linear-gradient(rgba(0, 255, 255, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.07) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: moveGrid 4s linear infinite;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* --- Шапка сайта --- */
+.site-header {
+    width: 100%;
+    padding: 20px 0;
+    background: rgba(10, 10, 10, 0.6);
+    backdrop-filter: blur(5px);
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.header-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo a {
+    font-size: 24px;
+    font-weight: 700;
+    color: #00ffff;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.main-nav a {
+    color: #e0e0e0;
+    text-decoration: none;
+    margin-left: 25px;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.main-nav a:hover {
+    color: #00ffff;
+}
+
+.lang-switcher a {
+    color: #a0a0a0;
+    text-decoration: none;
+    margin-left: 15px;
+    padding: 5px 8px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.lang-switcher a.active {
+    color: #00ffff;
+    border-color: #00ffff;
+}
+
+.lang-switcher a:hover {
+    color: #fff;
+    border-color: #fff;
+}
+
+/* --- Основной контейнер --- */
+main.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    padding: 40px;
+}
+
+.content-box {
+    width: 100%;
+    max-width: 800px;
+    background: rgba(18, 18, 18, 0.7);
+    padding: 40px 50px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    text-align: center;
+}
+
+h1 {
+    font-size: 48px;
+    margin: 0 0 15px 0;
+    color: #00ffff;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 0 8px #00ffff;
+}
+
+p {
+    color: #a0a0a0;
+    line-height: 1.6;
+}
+
+/* --- Элементы форм --- */
+input[type="text"], input[type="password"], input[type="file"], textarea {
+    width: calc(100% - 30px);
+    background-color: rgba(0, 255, 255, 0.05);
+    color: #e0e0e0;
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 4px;
+    padding: 15px;
+    font-size: 16px;
+    font-family: 'Chakra Petch', sans-serif;
+    margin-top: 20px;
+    transition: all 0.3s;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+button {
+    background-color: transparent;
+    color: #00ffff;
+    border: 2px solid #00ffff;
+    padding: 12px 25px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-family: 'Chakra Petch', sans-serif;
+    cursor: pointer;
+    margin-top: 20px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+button:hover {
+    background-color: #00ffff;
+    color: #0a0a0a;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+}
+
+/* --- Специфичные стили для главной --- */
+.home-container {
+    display: flex;
+    gap: 50px;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.brand-block, .tools-block, .stats-block {
+    flex: 1;
+}
+
+.tool-link {
+    display: block;
+    background: rgba(0, 255, 255, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.tool-link:hover {
+    border-color: #00ffff;
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0, 255, 255, 0.2);
+}
+
+.tool-link h2 {
+    margin: 0 0 10px 0;
+    color: #e0e0e0;
+}
+
+.stats-block {
+    text-align: center;
+}
+
+.stat-item {
+    margin-bottom: 20px;
+}
+
+.stat-number {
+    display: block;
+    font-size: 42px;
+    font-weight: 700;
+    color: #00ffff;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #a0a0a0;
+    text-transform: uppercase;
+}

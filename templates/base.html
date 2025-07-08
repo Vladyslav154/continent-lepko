@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ t('app_title') }}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="/">{{ t('app_title') }}</a>
+            </div>
+            <nav class="main-nav">
+                <a href="/upgrade">{{ t('upgrade_link') }}</a>
+            </nav>
+            <div class="lang-switcher">
+                {% for code, name in LANGUAGES.items() %}
+                <a href="?lang={{ code }}" class="{% if current_lang == code %}active{% endif %}">{{ name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="content-box">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+</body>
+</html>

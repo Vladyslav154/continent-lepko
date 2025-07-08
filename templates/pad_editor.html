@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ t('pad_editor_title', room_id=room_id) }}</h1>
+<textarea id="pad-content" style="width: 100%; height: 50vh; resize: vertical;"></textarea>
+<p>{{ t('pad_editor_info') }}</p>
+{% endblock %}

@@ -1,0 +1,26 @@
+services:
+  # Наш главный веб-сервис
+  - type: web
+    name: continent-lepko
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port ${PORT:-10000}"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.5
+      - key: SECRET_KEY
+        generateValue: true
+      - key: COINBASE_API_KEY
+        sync: false # Этот ключ вы введете вручную в панели Render
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: lepko-redis
+          property: connectionString
+
+  # Наша база данных Redis
+  - type: redis
+    name: lepko-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: [] # ИСПРАВЛЕНИЕ: Разрешаем доступ внутри сети Render
